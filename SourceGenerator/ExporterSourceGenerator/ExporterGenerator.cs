@@ -73,16 +73,19 @@ public class ExporterGenerator : IIncrementalGenerator
         string header = string.Join(info.Separator, info.Properties.Select(p => p.Name));
 
         sb.AppendLine($"// Auto-generated exporter for {info.ClassName}");
+        sb.AppendLine($"using System.Text;");
+        sb.AppendLine();
         sb.AppendLine($"namespace {info.Namespace};");
         sb.AppendLine($"public static class {info.ClassName}Exporter {{");
-        sb.AppendLine($"    public static void ExportToCsv(IEnumerable<{info.ClassName}> list, string filePath) {{");
-        sb.AppendLine($"        using var writer = new System.IO.StreamWriter(filePath);");
+        sb.AppendLine($"    public static string ExportToCsv(IEnumerable<{info.ClassName}> list) {{");
+        sb.AppendLine($"        var sb = new StringBuilder();");
         // Header
-        sb.AppendLine($"        writer.WriteLine(\"{header}\");");
+        sb.AppendLine($"        sb.AppendLine(\"{header}\");");
         // Rows
         sb.AppendLine($"        foreach (var item in list) {{");
-        sb.AppendLine($"            writer.WriteLine($\"{string.Join(info.Separator, info.Properties.Select(p => $"{{item.{p.Name}}}"))}\");");
+        sb.AppendLine($"            sb.AppendLine($\"{string.Join(info.Separator, info.Properties.Select(p => $"{{item.{p.Name}}}"))}\");");
         sb.AppendLine($"        }}");
+        sb.AppendLine($"        return sb.ToString();");
         sb.AppendLine($"    }}");
         sb.AppendLine($"}}");
         return sb.ToString();
